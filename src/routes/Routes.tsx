@@ -40,26 +40,26 @@ export const routes = createBrowserRouter([
         path: "/login",
         element: <LoginPage />,
       },
-      {
-        path: "/forgot-password",
-        element: <ForgotPasswordPage />,
-      },
-      {
-        path: "/verify-register-otp",
-        element: <VerifyRegisterOtpPage />,
-      },
-      {
-        path: "/verify-reset-pass-otp",
-        element: <VerifyResetPassOtpPage />,
-      },
-      {
-        path: "/reset-password",
-        element: <ResetPasswordPage />,
-      },
     ],
   },
   {
     path: "*",
     element: <NotFoundError />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/verify-register-otp",
+    element: <VerifyRegisterOtpPage />,
+  },
+  {
+    path: "/verify-reset-pass-otp",
+    element: <VerifyResetPassOtpPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
 ]);

@@ -1,8 +1,11 @@
-import banner from "@/assets/images/auth-banner.jpg";
 import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useState, type ReactNode } from "react";
+import toast from "react-hot-toast";
+import axios from "axios";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,16 +15,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/custom/custom-bg-input";
-import PasswordField from "@/components/form/PasswordField";
-import Logo from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
-import GoogleAuthButton from "@/components/shared/GoogleAuthButton";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import axios from "axios";
-
 import { useAuthContext } from "@/hooks/useAppContext";
+
+const imgVuesaxLinearSms =
+  "https://www.figma.com/api/mcp/asset/99b4e4db-5bc4-41de-8f1b-ec374d46895d";
+const imgVuesaxLinearLock =
+  "https://www.figma.com/api/mcp/asset/8b31db40-d8cf-43c0-89f1-50f8275c9db4";
+const imgIconIcEyeOff =
+  "https://www.figma.com/api/mcp/asset/b7afbd8e-98a7-4667-bbb0-cc1618974b0f";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -31,6 +33,7 @@ const formSchema = z.object({
 const LoginPage = () => {
   const { login } = useAuthContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,7 +48,6 @@ const LoginPage = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true);
-      console.log(values);
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}account/login/`,
         {
@@ -53,14 +55,12 @@ const LoginPage = () => {
           password: values.password,
         },
       );
-      console.log(response.data.data);
       const { access, refresh } = response.data.data.data.tokens;
       const user = response.data.data.data.user;
-      
+
       login(access, refresh, user);
 
       navigate("/business-dashboard");
-      // navigate("/get-started-form");
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message ||
@@ -73,108 +73,156 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5">
-      <div className="left hidden lg:block lg:col-span-2">
-        <div className="p-1.5 sm:p-2 lg:p-2.5 h-screen sticky top-0">
-          <figure className="rounded-2xl lg:rounded-3xl overflow-hidden h-full relative">
-            <img
-              src={banner}
-              alt=""
-              className="w-full h-full object-cover object-center"
-            />
-            <Logo className="absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-8 lg:left-8 xl:top-10 xl:left-10" />
-          </figure>
+    <div className="mx-auto w-full max-w-150 space-y-10">
+      <header className="w-full text-center">
+        <div className="space-y-3">
+          <h1 className=" text-[32px] font-semibold leading-12 tracking-normal text-[#212B36]">
+            Login
+          </h1>
+          <p className=" text-[16px] font-normal leading-6 text-[#637381]">
+            Welcome Back! Access Your Account Securely.
+          </p>
         </div>
-      </div>
-      <div className="right col-span-1 lg:col-span-2 xl:col-span-3 flex flex-col justify-center overflow-y-auto">
-        <div
-          className={cn(
-            "max-w-[800px] w-full mx-auto px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12 lg:px-10 lg:py-14 xl:px-16 xl:py-20 2xl:px-20 2xl:py-20",
-          )}
+      </header>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-4"
         >
-          {/* Mobile Logo - Only shown on screens smaller than lg */}
-          <div className="lg:hidden mb-6 sm:mb-8">
-            <Logo />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className=" text-[16px] font-normal leading-6 text-[#637381]">
+                  Email address
+                </FormLabel>
+                <FormControl>
+                  <FieldShell
+                    icon={
+                      <img src={imgVuesaxLinearSms} alt="" className="size-6" />
+                    }
+                  >
+                    <input
+                      {...field}
+                      placeholder="johncarter@brix.com"
+                      className={inputClassName}
+                    />
+                  </FieldShell>
+                </FormControl>
+                <FormMessage className=" text-xs text-destructive" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className=" text-[16px] font-normal leading-6 text-[#637381]">
+                  Password
+                </FormLabel>
+                <FormControl>
+                  <FieldShell
+                    icon={
+                      <img
+                        src={imgVuesaxLinearLock}
+                        alt=""
+                        className="size-6"
+                      />
+                    }
+                    rightIcon={
+                      <button
+                        type="button"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                        onClick={() => setShowPassword((current) => !current)}
+                        className="flex size-6 items-center justify-center text-[#919EAB] transition-opacity hover:opacity-80"
+                      >
+                        <img src={imgIconIcEyeOff} alt="" className="size-6" />
+                      </button>
+                    }
+                    className="pr-4"
+                  >
+                    <input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="***********"
+                      className={inputClassName}
+                    />
+                  </FieldShell>
+                </FormControl>
+                <FormMessage className=" text-xs text-destructive" />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-end pt-2">
+            <Link
+              to="/forgot-password"
+              className="font-semibold text-[14px] text-[#4371EB] hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
 
-          <div className="space-y-1.5 sm:space-y-3 xl:space-y-4 mb-6 sm:mb-8">
-            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-semibold leading-tight">
-              Login to your account
-            </h1>
-            <p className="text-[#686E77] text-sm sm:text-base lg:text-lg">
-              Don't have an account?{" "}
-              <Link
-                to="/register"
-                className="text-primary text-sm sm:text-base lg:text-lg hover:underline font-medium"
-              >
-                Sign up
-              </Link>
-            </p>
-          </div>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 sm:space-y-5 lg:space-y-6"
+          <div className="pt-4">
+            <Button
+              type="submit"
+              className="h-13 w-full rounded-lg bg-[#4371EB] font-[Inter] text-[16px] font-semibold leading-6 text-white shadow-none hover:bg-[#3c67db]"
+              disabled={isSubmitting}
             >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm sm:text-base">
-                      Email Address*
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@company.com" {...field} />
-                    </FormControl>
-                    <FormMessage className="text-xs sm:text-sm" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm sm:text-base">
-                      Password *
-                    </FormLabel>
-                    <PasswordField placeholder="Enter password" {...field} />
-                    <FormMessage className="text-xs sm:text-sm" />
-                  </FormItem>
-                )}
-              />
-              <div className="flex justify-end">
-                <Link
-                  to="/forgot-password"
-                  className="text-primary text-sm sm:text-base font-medium hover:underline"
-                >
-                  Forgot Password?
-                </Link>
-              </div>
-              <div className="pt-1 sm:pt-2">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full text-base sm:text-lg lg:text-xl font-semibold py-2.5 sm:py-3 lg:py-3.5"
-                >
-                  {isSubmitting ? "Logging in..." : "Login"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-          <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-5 lg:mt-6 mb-4 sm:mb-6 lg:mb-8">
-            <div className="bg-[#E5EBF0] h-px flex-1"></div>
-            <p className="leading-none text-[#9DA2A8] text-sm sm:text-base lg:text-lg font-medium">
-              Or login with
-            </p>
-            <div className="bg-[#E5EBF0] h-px flex-1"></div>
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
           </div>
-          <GoogleAuthButton />
-        </div>
-      </div>
+        </form>
+      </Form>
+
+      <p className="text-center  text-[16px] font-normal leading-6 text-[#637381]">
+        Don't have an account yet?{" "}
+        <Link
+          to="/register"
+          className="font-semibold text-[#4371EB] hover:underline"
+        >
+          Sign up
+        </Link>
+      </p>
     </div>
   );
 };
 
 export default LoginPage;
+
+const inputClassName =
+  "w-full border-0 bg-transparent p-0  text-[16px] font-semibold leading-6 text-[#212B36] placeholder:text-[#212B36] placeholder:opacity-100 focus:outline-none";
+
+type FieldShellProps = {
+  icon: ReactNode;
+  rightIcon?: ReactNode;
+  className?: string;
+  children: ReactNode;
+};
+
+function FieldShell({ icon, rightIcon, className, children }: FieldShellProps) {
+  return (
+    <div
+      className={cn(
+        "flex h-14 items-center gap-3 rounded-[12px] border border-[#DFE3E8] bg-[#F9FAFB] px-4 shadow-[0px_0.5px_0.5px_rgba(25,33,61,0.04)]",
+        className,
+      )}
+    >
+      <span className="flex size-6 shrink-0 items-center justify-center">
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">{children}</div>
+      {rightIcon ? (
+        <span className="flex size-6 shrink-0 items-center justify-center">
+          {rightIcon}
+        </span>
+      ) : null}
+    </div>
+  );
+}

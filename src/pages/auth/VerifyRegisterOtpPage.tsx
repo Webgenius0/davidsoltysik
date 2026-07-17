@@ -1,6 +1,3 @@
-// import { BackIcon2, ForwardIcon2, LoaderIcon2 } from "@/assets/icons/icons";
-import banner from "@/assets/images/auth-banner.jpg";
-import Logo from "@/components/shared/Logo";
 import { Link, useNavigate } from "react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import {
@@ -9,16 +6,16 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "@/hooks/useAppContext";
+import { Button } from "@/components/ui/button";
 
 const VerifyRegisterOtpPage = () => {
-  const { login } = useAuthContext();
+  useAuthContext();
   const [otpValue, setOtpValue] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const email = sessionStorage.getItem("registeredEmail") || "";
+  const [isSubmitting] = useState(false);
+  const email = sessionStorage.getItem("registeredEmail") || "acb@domain";
   const navigate = useNavigate();
   const [resendTimer, setResendTimer] = useState<number>(0);
   const [isResendLoading, setIsResendLoading] = useState(false);
@@ -34,29 +31,31 @@ const VerifyRegisterOtpPage = () => {
   }, [resendTimer]);
 
   const handleSubmit = async () => {
-    try {
-      setIsSubmitting(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}account/verify-email/`,
-        { email, code: otpValue },
-      );
+    navigate("/login");
 
-      const { access, refresh } = response.data.data.data.tokens;
-      const user = response.data.data.data.user;
+    // try {
+    //   setIsSubmitting(true);
+    //   const response = await axios.post(
+    //     `${import.meta.env.VITE_BASE_URL}account/verify-email/`,
+    //     { email, code: otpValue },
+    //   );
 
-      login(access, refresh, user);
-      toast.success(response?.data?.message || "Email verified successfully!");
+    //   const { access, refresh } = response.data.data.data.tokens;
+    //   const user = response.data.data.data.user;
 
-      navigate("/login");
-    } catch (error: any) {
-      console.error("Error during form submission:", error);
-      toast.error(
-        error?.response?.data?.message ||
-          "An unexpected error occurred. Please try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    //   login(access, refresh, user);
+    //   toast.success(response?.data?.message || "Email verified successfully!");
+
+    //   navigate("/login");
+    // } catch (error: any) {
+    //   console.error("Error during form submission:", error);
+    //   toast.error(
+    //     error?.response?.data?.message ||
+    //       "An unexpected error occurred. Please try again.",
+    //   );
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
   };
 
   const handleResendOtp = async () => {
@@ -71,7 +70,7 @@ const VerifyRegisterOtpPage = () => {
     } catch (error: any) {
       console.error("Resend OTP error:", error);
       toast.error(
-        error.response.data.message ||
+        error.response?.data?.message ||
           "Failed to resend OTP. Please try again.",
       );
     } finally {
@@ -80,113 +79,89 @@ const VerifyRegisterOtpPage = () => {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 relative">
-      <div className="left hidden lg:block lg:col-span-2">
-        <div className="p-1.5 sm:p-2 lg:p-2.5 h-screen sticky top-0">
-          <figure className="rounded-2xl lg:rounded-3xl overflow-hidden h-full relative">
-            <img
-              src={banner}
-              alt=""
-              className="w-full h-full object-cover object-center"
-            />
-            <Logo className="absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-8 lg:left-8 xl:top-10 xl:left-10" />
-          </figure>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 bg-[#F9FAFB]">
+      <div className="mx-auto w-full max-w-150 space-y-8">
+        <div className="w-full flex justify-start">
+          <Link
+            to="/register"
+            className="flex items-center gap-1 text-[14px] font-semibold text-[#212B36] hover:opacity-80"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Back
+          </Link>
         </div>
-      </div>
-      <div className="right col-span-1 lg:col-span-2 xl:col-span-3 flex flex-col justify-center overflow-y-auto">
-        <div
-          className={cn(
-            "max-w-200 w-full mx-auto px-4 py-8 sm:px-6 sm:py-10 md:px-8 md:py-12 lg:px-10 lg:py-14 xl:px-16 xl:py-20 2xl:px-20 2xl:py-20 space-y-8 sm:space-y-10 lg:space-y-14",
-          )}
-        >
-          {/* Mobile Logo - Only shown on screens smaller than lg */}
-          <div className="lg:hidden mb-6 sm:mb-8">
-            <Logo />
-          </div>
 
-          <div className="space-y-1.5 sm:space-y-3 xl:space-y-4">
-            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-semibold leading-tight">
-              Verify Your Account
+        <header className="w-full text-center">
+          <div className="space-y-3">
+            <h1 className=" text-[32px] font-semibold leading-12 tracking-normal text-[#212B36]">
+              Please check your email!
             </h1>
-            <p className="text-[#686E77] text-sm sm:text-base lg:text-lg">
-              We sent a 6 digit verification code to your email
-              <br />
-              {email}
+            <p className=" text-[16px] font-normal leading-6 text-[#637381]">
+              We've emailed a 6-digit confirmation code to {email}, please enter
+              the code in below box to verify your email.
             </p>
           </div>
-          <div className="">
-            <p className="text-base sm:text-lg lg:text-xl font-medium mb-3 sm:mb-3.5 lg:mb-4.5">
-              Enter 6 digit code
-            </p>
-            <InputOTP
-              maxLength={6}
-              pattern={REGEXP_ONLY_DIGITS}
-              value={otpValue}
-              onChange={(value: string) => setOtpValue(value)}
-              className=""
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot index={1} />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot index={3} />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot index={4} />
-              </InputOTPGroup>
-              <InputOTPGroup>
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-            <p className="text-[#93979E] text-sm sm:text-base lg:text-lg font-medium mt-5 sm:mt-6 lg:mt-7">
-              Didn't receive the code?{" "}
-              {resendTimer > 0 ? (
-                <span className="text-primary">Resend in {resendTimer}s</span>
-              ) : (
-                <button
-                  type="button"
-                  className="text-primary hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-auto"
-                  onClick={handleResendOtp}
-                  disabled={isResendLoading}
-                >
-                  Resend Code
-                </button>
-              )}
-            </p>
-          </div>
-          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 sm:gap-4">
-            <Link
-              to={"/register"}
-              className="cursor-pointer text-base sm:text-lg lg:text-xl inline-flex justify-center items-center gap-1 w-full sm:w-40 py-3 sm:py-3.5 lg:py-4 rounded-md bg-[#F4F4F4] group"
-            >
-              <BackIcon2 className="group-hover:-translate-x-3 transition-all duration-200" />{" "}
-              <span className="">Back</span>
-            </Link>
-            <button
+        </header>
+
+        <div className="w-full space-y-8 flex flex-col items-center">
+          <InputOTP
+            maxLength={6}
+            pattern={REGEXP_ONLY_DIGITS}
+            value={otpValue}
+            onChange={(value: string) => setOtpValue(value)}
+          >
+            <InputOTPGroup className="gap-2 sm:gap-4!">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <InputOTPSlot
+                  key={i}
+                  index={i}
+                  className="h-12 w-10 sm:h-[60px] sm:w-[71px] rounded-[12px] border-l border border-[#DFE3E8] bg-white text-xl sm:text-2xl font-semibold text-[#212B36] first:border-l first:rounded-[12px] last:rounded-[12px] data-[active=true]:border-[#4371EB] data-[active=true]:ring-[#4371EB]/20"
+                />
+              ))}
+            </InputOTPGroup>
+          </InputOTP>
+
+          <div className="pt-2 w-full">
+            <Button
               onClick={handleSubmit}
               disabled={isSubmitting || otpValue.length < 6}
-              className="cursor-pointer text-base sm:text-lg lg:text-xl inline-flex justify-center items-center gap-1 w-full sm:w-40 py-3 sm:py-3.5 lg:py-4 rounded-md bg-primary text-[#FDFDFD] group disabled:opacity-50 disabled:cursor-auto"
+              className="h-13 w-full rounded-lg bg-[#4371EB] font-[Inter] text-[16px] font-semibold leading-6 text-white shadow-none hover:bg-[#3c67db]"
             >
-              <span className="">Submit</span>{" "}
-              <ForwardIcon2 className="group-hover:translate-x-3 transition-all duration-200" />
+              {isSubmitting ? "Verifying..." : "Verify"}
+            </Button>
+          </div>
+        </div>
+
+        <p className="text-center text-[16px] font-normal leading-6 text-[#637381]">
+          Don't have a code?{" "}
+          {resendTimer > 0 ? (
+            <span className="font-semibold text-[#4371EB]">
+              Resend in {resendTimer}s
+            </span>
+          ) : (
+            <button
+              type="button"
+              className="font-semibold text-[#4371EB] hover:underline disabled:opacity-50"
+              onClick={handleResendOtp}
+              disabled={isResendLoading}
+            >
+              Resend code
             </button>
-          </div>
-        </div>
+          )}
+        </p>
       </div>
-      {isSubmitting && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5">
-          <div className="hidden lg:block lg:col-span-2"></div>
-          <div className="col-span-1 lg:col-span-2 xl:col-span-3 flex items-center justify-center">
-            <LoaderIcon2 className="animate-spin animation-duration-[2.5s]" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
